@@ -1,0 +1,48 @@
+# Dependencies
+node_modules/
+dist/
+build/
+.yarn/
+
+# Environment Variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# AI & Agent Files (EXCLUDE FROM GITHUB)
+agent/
+.agent/
+.gemini/
+brain/
+analysis_results.md
+implementation_plan.md
+task.md
+walkthrough.md
+.system_generated/
+
+# Logs & Debug
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# System
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDEs
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Project Specific
+Postman_Collection.json (if desired to keep locally)
+backend/node_modules/
+frontend/node_modules/
+frontend/dist/
