@@ -112,7 +112,7 @@ const Home = ({ searchQuery }) => {
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: index * 0.1 }}
                             whileHover={{ y: -10 }}
-                            onClick={() => !IS_DEMO && navigate(`/hotel/${hotel._id}`)}
+                            onClick={() => navigate(`/hotel/${hotel._id}`)}
                         >
                             <div className="hotel-img-wrapper">
                                 <img
