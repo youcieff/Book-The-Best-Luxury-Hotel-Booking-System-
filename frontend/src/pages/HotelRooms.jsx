@@ -80,9 +80,7 @@ const HotelRooms = () => {
                 />
             )}
 
-            <style jsx>{`
-                .rooms-grid-container { margin-top: 20px; }
-            `}</style>
+
         </div>
     );
 };

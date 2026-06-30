@@ -113,10 +113,7 @@ const MyReservations = () => {
                     ))
                 )}
             </div>
-            <style jsx>{`
-                .reservations-page { padding-top: 120px; padding-bottom: 80px; }
-                .hotel-name { font-size: 0.85rem; color: var(--primary); display: flex; align-items: center; gap: 5px; margin-top: 5px; }
-            `}</style>
+
         </div>
     );
 };

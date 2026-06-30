@@ -149,12 +149,7 @@ const Home = ({ searchQuery }) => {
                 )}
             </section>
 
-            <style jsx>{`
-        .home-page { padding-bottom: 80px; }
-        .section-title-alt { margin: 60px 0 40px 0; }
-        .section-title-alt h1 { font-size: 2.2rem; font-weight: 800; margin-bottom: 5px; }
-        .section-title-alt p { color: var(--text-muted); }
-      `}</style>
+
         </div>
     );
 };

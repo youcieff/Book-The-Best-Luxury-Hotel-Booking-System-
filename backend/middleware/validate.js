@@ -68,6 +68,7 @@ const createRoomSchema = Joi.object({
     hotel: Joi.string().required().messages({
         'any.required': 'Hotel ID is required',
     }),
+    image: Joi.string(),
 });
 
 const updateRoomSchema = Joi.object({
@@ -77,6 +78,7 @@ const updateRoomSchema = Joi.object({
     description: Joi.string().min(5),
     hotel: Joi.string(),
     isAvailable: Joi.boolean(),
+    image: Joi.string(),
 }).min(1);
 
 // ── Booking Schemas ──

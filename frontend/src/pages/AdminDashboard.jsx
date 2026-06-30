@@ -331,10 +331,7 @@ const AdminDashboard = () => {
                 </div>
             )}
 
-            <style jsx>{`
-                .admin-brand { display: flex; align-items: center; gap: 20px; }
-                .item-expand { padding: 10px; opacity: 0.5; }
-            `}</style>
+
         </div>
     );
 };

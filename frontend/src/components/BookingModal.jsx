@@ -102,37 +102,7 @@ const BookingModal = ({ isOpen, onClose, room }) => {
                         </form>
                     </motion.div>
 
-                    <style jsx>{`
-            .modal-overlay {
-              position: fixed;
-              top: 0;
-              left: 0;
-              width: 100%;
-              height: 100%;
-              background: rgba(0,0,0,0.85);
-              backdrop-filter: blur(10px);
-              z-index: 2500;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-            }
-            .modal-container {
-              width: 90%;
-              max-width: 500px;
-              padding: 2.5rem;
-              border-radius: 32px;
-              position: relative;
-            }
-            .close-btn { position: absolute; top: 20px; right: 20px; background: none; border: none; color: white; cursor: pointer; }
-            .room-preview { margin-bottom: 2rem; border-bottom: 1px solid var(--glass-border); padding-bottom: 1rem; }
-            .price-tag { color: var(--primary); font-weight: 600; }
-            .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 1.5rem; }
-            label { display: flex; align-items: center; gap: 8px; font-size: 0.8rem; margin-bottom: 8px; color: var(--text-muted); }
-            .summary-card { padding: 1.5rem; border-radius: 20px; margin-bottom: 1.5rem; }
-            .summary-row { display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 8px; color: var(--text-muted); }
-            .total-row { display: flex; justify-content: space-between; font-weight: 700; font-size: 1.2rem; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--glass-border); }
-            .full-width { width: 100%; justify-content: center; padding: 15px; }
-          `}</style>
+
                 </div>
             )}
         </AnimatePresence>
