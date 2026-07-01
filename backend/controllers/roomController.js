@@ -48,7 +48,7 @@ const createRoom = asyncHandler(async (req, res) => {
         price,
         description,
         hotel,
-        image: req.file ? `/uploads/${req.file.filename}` : '/uploads/no-photo.jpg',
+        image: req.body.image || '/uploads/no-photo.jpg',
     });
 
     const createdRoom = await room.save();
@@ -68,8 +68,8 @@ const updateRoom = asyncHandler(async (req, res) => {
         room.description = description || room.description;
         room.hotel = hotel || room.hotel;
 
-        if (req.file) {
-            room.image = `/uploads/${req.file.filename}`;
+        if (req.body.image) {
+            room.image = req.body.image;
         }
 
         const updatedRoom = await room.save();
