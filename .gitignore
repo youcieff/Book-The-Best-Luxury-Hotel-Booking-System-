@@ -42,7 +42,10 @@ desktop.ini
 *.sublime-workspace
 
 # Project Specific
-Postman_Collection.json (if desired to keep locally)
 backend/node_modules/
 frontend/node_modules/
 frontend/dist/
+frontend/.next/
+frontend_next/.next/
+backend/uploads/*
+!backend/uploads/.gitkeep
