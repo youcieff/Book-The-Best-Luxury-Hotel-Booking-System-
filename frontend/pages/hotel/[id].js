@@ -108,7 +108,7 @@ export default function HotelRooms() {
             <section className="hotel-header">
                 <motion.div
                     className="hotel-hero-img"
-                    style={{ backgroundImage: `url(${hotel.image})`, backgroundColor: '#0b0d17' }}
+                    style={{ backgroundImage: `url(${hotel.image && hotel.image !== '/uploads/no-photo.jpg' ? (hotel.image.startsWith('http') ? hotel.image : `http://localhost:5000${hotel.image}`) : 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&q=80&w=2000'})`, backgroundColor: '#0b0d17' }}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                 >

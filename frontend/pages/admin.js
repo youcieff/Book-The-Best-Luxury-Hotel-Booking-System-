@@ -244,7 +244,7 @@ export default function AdminDashboard() {
                         <div key={h._id} className="inventory-item">
                             <div className="inventory-card glass-premium">
                                 <div className="item-main" onClick={() => setExpandedHotel(expandedHotel === h._id ? null : h._id)}>
-                                    <div className="item-img glass" style={{ backgroundImage: `url(http://localhost:5000${h.image})` }}></div>
+                                    <div className="item-img glass" style={{ backgroundImage: `url(${h.image && h.image !== '/uploads/no-photo.jpg' ? (h.image.startsWith('http') ? h.image : `http://localhost:5000${h.image}`) : 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&q=80&w=2000'})` }}></div>
                                     <div className="item-details">
                                         <h3>{h.name}</h3>
                                         <span className="location-tag"><MapPin size={14} /> {h.location}</span>

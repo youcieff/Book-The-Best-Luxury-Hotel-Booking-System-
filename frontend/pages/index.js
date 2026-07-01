@@ -67,7 +67,7 @@ export default function Home() {
                             >
                                 <div className="hotel-img-wrapper">
                                     <img
-                                        src={hotel.image.startsWith('http') ? hotel.image : 'https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&q=80&w=800'}
+                                        src={hotel.image && hotel.image !== '/uploads/no-photo.jpg' ? (hotel.image.startsWith('http') ? hotel.image : `http://localhost:5000${hotel.image}`) : 'https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&q=80&w=800'}
                                         alt={hotel.name}
                                         className="hotel-img"
                                     />

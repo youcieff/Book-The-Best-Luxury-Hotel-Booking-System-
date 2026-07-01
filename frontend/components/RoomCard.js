@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import { Bed, Users } from 'lucide-react';
 
 const RoomCard = ({ room, onBook }) => {
-    const imageUrl = room.image
+    const imageUrl = room.image && room.image !== '/uploads/no-photo.jpg'
         ? room.image.startsWith('http')
             ? room.image
             : `http://localhost:5000${room.image}`
