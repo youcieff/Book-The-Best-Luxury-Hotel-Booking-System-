@@ -1,4 +1,4 @@
-import { createContext, useState, useContext } from 'react';
+import { createContext, useState, useContext, useEffect } from 'react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 
@@ -15,14 +15,18 @@ const DEMO_USER = {
 
 export const AuthProvider = ({ children }) => {
     const isDemo = typeof window !== 'undefined' && !window.location.hostname.includes('localhost');
+    const [user, setUser] = useState(null);
+    const [loading, setLoading] = useState(true);
 
-    const [user, setUser] = useState(() => {
-        if (typeof window === 'undefined') return null;
-        if (isDemo) return DEMO_USER;
-        return JSON.parse(localStorage.getItem('user')) || null;
-    });
-    const [loading, setLoading] = useState(false);
-
+    useEffect(() => {
+        if (isDemo) {
+            setUser(DEMO_USER);
+        } else {
+            const stored = localStorage.getItem('user');
+            if (stored) setUser(JSON.parse(stored));
+        }
+        setLoading(false);
+    }, [isDemo]);
     const API_URL = 'http://localhost:5000/api/auth';
 
     const login = async (email, password) => {
