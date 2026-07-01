@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
 import { LogOut, User as UserIcon, Menu, X, Hotel, Calendar, LayoutDashboard, Search } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -7,18 +8,17 @@ import { motion, AnimatePresence } from 'framer-motion';
 const Navbar = ({ onAuthClick, onSearch }) => {
     const { user, logout } = useAuth();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const navigate = useNavigate();
-    const location = useLocation();
+    const router = useRouter();
 
     const handleLogout = () => {
         logout();
-        navigate('/');
+        router.push('/');
     };
 
     return (
         <nav className="navbar glass-premium full-width">
             <div className="nav-container full-width">
-                <Link to="/" className="logo">
+                <Link href="/" className="logo">
                     <div className="logo-icon">
                         <Hotel size={24} />
                     </div>
@@ -26,7 +26,7 @@ const Navbar = ({ onAuthClick, onSearch }) => {
                 </Link>
 
                 <div className="nav-center">
-                    {location.pathname === '/' && onSearch && (
+                    {router.pathname === '/' && onSearch && (
                         <div className="nav-search glass">
                             <Search size={18} />
                             <input
@@ -38,21 +38,20 @@ const Navbar = ({ onAuthClick, onSearch }) => {
                     )}
                 </div>
 
-                {/* Desktop Nav */}
                 <div className="nav-links desktop">
                     {user ? (
                         <>
                             {user.role === 'user' && (
                                 <>
-                                    <Link to="/">Home</Link>
-                                    <Link to="/my-reservations" className="nav-item">
+                                    <Link href="/">Home</Link>
+                                    <Link href="/my-reservations" className="nav-item">
                                         <Calendar size={18} /> My Reservations
                                     </Link>
                                 </>
                             )}
 
                             {user.role === 'admin' && (
-                                <Link to="/admin" className="nav-item admin-link">
+                                <Link href="/admin" className="nav-item admin-link">
                                     <LayoutDashboard size={18} /> Admin Panel
                                 </Link>
                             )}
@@ -73,13 +72,11 @@ const Navbar = ({ onAuthClick, onSearch }) => {
                     )}
                 </div>
 
-                {/* Mobile Toggle */}
                 <button className="mobile-toggle" onClick={() => setIsMenuOpen(!isMenuOpen)}>
                     {isMenuOpen ? <X /> : <Menu />}
                 </button>
             </div>
 
-            {/* Mobile Menu */}
             <AnimatePresence>
                 {isMenuOpen && (
                     <motion.div
@@ -92,12 +89,12 @@ const Navbar = ({ onAuthClick, onSearch }) => {
                             <div className="mobile-links">
                                 {user.role === 'user' && (
                                     <>
-                                        <Link to="/" onClick={() => setIsMenuOpen(false)}>Home</Link>
-                                        <Link to="/my-reservations" onClick={() => setIsMenuOpen(false)}>My Reservations</Link>
+                                        <Link href="/" onClick={() => setIsMenuOpen(false)}>Home</Link>
+                                        <Link href="/my-reservations" onClick={() => setIsMenuOpen(false)}>My Reservations</Link>
                                     </>
                                 )}
                                 {user.role === 'admin' && (
-                                    <Link to="/admin" onClick={() => setIsMenuOpen(false)}>Admin Panel</Link>
+                                    <Link href="/admin" onClick={() => setIsMenuOpen(false)}>Admin Panel</Link>
                                 )}
                                 <button onClick={handleLogout} className="btn btn-outline full-width">Logout</button>
                             </div>
@@ -107,8 +104,6 @@ const Navbar = ({ onAuthClick, onSearch }) => {
                     </motion.div>
                 )}
             </AnimatePresence>
-
-
         </nav>
     );
 };

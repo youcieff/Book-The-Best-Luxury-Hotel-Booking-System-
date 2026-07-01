@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { motion } from 'framer-motion';
-import { Plus, Hotel, Bed, Trash2, Edit, X, Calendar, User as UserIcon, MapPin, ChevronRight, ChevronDown, Camera, LayoutDashboard, Upload, Loader2, Phone, CheckCircle } from 'lucide-react';
+import { Plus, Hotel, Bed, Trash2, X, Calendar, User as UserIcon, MapPin, ChevronRight, ChevronDown, Upload, Loader2, Phone, CheckCircle, LayoutDashboard } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
+import Navbar from '../components/Navbar';
+import AuthModal from '../components/AuthModal';
 
-const AdminDashboard = () => {
-    const { user } = useAuth();
+export default function AdminDashboard() {
+    const { user, isDemo } = useAuth();
     const [activeTab, setActiveTab] = useState('hotels');
     const [hotels, setHotels] = useState([]);
     const [bookings, setBookings] = useState([]);
@@ -17,8 +19,10 @@ const AdminDashboard = () => {
     const [newHotel, setNewHotel] = useState({ name: '', location: '', description: '', image: '' });
     const [newRoom, setNewRoom] = useState({ roomNumber: '', type: 'Single', price: '', description: '' });
     const [uploading, setUploading] = useState(false);
+    const [authOpen, setAuthOpen] = useState(false);
 
     const fetchHotels = async () => {
+        if (isDemo) { setHotels([]); setLoading(false); return; }
         try {
             const { data: hotelsData } = await axios.get('http://localhost:5000/api/hotels');
             const hotelsWithRooms = await Promise.all(hotelsData.map(async (h) => {
@@ -31,6 +35,7 @@ const AdminDashboard = () => {
     };
 
     const fetchAllBookings = async () => {
+        if (isDemo) { setBookings([]); setLoading(false); return; }
         setLoading(true);
         try {
             const { data } = await axios.get('http://localhost:5000/api/bookings', {
@@ -46,22 +51,15 @@ const AdminDashboard = () => {
         const formData = new FormData();
         formData.append('image', file);
         setUploading(true);
-
         try {
             const { data } = await axios.post('http://localhost:5000/api/upload', formData, {
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
-            if (type === 'hotel') {
-                setNewHotel({ ...newHotel, image: data.filePath });
-            } else {
-                setNewRoom({ ...newRoom, image: data.filePath });
-            }
+            if (type === 'hotel') setNewHotel({ ...newHotel, image: data.filePath });
+            else setNewRoom({ ...newRoom, image: data.filePath });
             toast.success('Image uploaded successfully');
-        } catch (error) {
-            toast.error('Image upload failed');
-        } finally {
-            setUploading(false);
-        }
+        } catch (error) { toast.error('Image upload failed'); }
+        finally { setUploading(false); }
     };
 
     useEffect(() => {
@@ -112,9 +110,8 @@ const AdminDashboard = () => {
                 headers: { Authorization: `Bearer ${user.token}` }
             });
             toast.success('Room deleted');
-            setNewRoom({ roomNumber: '', type: 'Single', price: '', description: '', image: '' });
             fetchHotels();
-        } catch (error) { toast.error('Failed to add room'); }
+        } catch (error) { toast.error('Failed to delete room'); }
     };
 
     const handleConfirmBooking = async (id) => {
@@ -129,6 +126,9 @@ const AdminDashboard = () => {
 
     return (
         <div className="admin-page container full-width">
+            <Navbar onAuthClick={() => setAuthOpen(true)} />
+            <AuthModal isOpen={authOpen} onClose={() => setAuthOpen(false)} />
+
             <div className="admin-header-row">
                 <div className="admin-brand">
                     <LayoutDashboard size={40} className="text-gold" />
@@ -168,7 +168,6 @@ const AdminDashboard = () => {
                                     <input type="text" placeholder="e.g. North Coast, Egypt" required onChange={e => setNewHotel({ ...newHotel, location: e.target.value })} />
                                 </div>
                             </div>
-
                             <div className="input-group">
                                 <label>Property Image</label>
                                 <div className="file-upload-wrapper glass">
@@ -179,7 +178,6 @@ const AdminDashboard = () => {
                                     </label>
                                 </div>
                             </div>
-
                             <div className="input-group">
                                 <label>Luxury Description</label>
                                 <textarea placeholder="Describe the exceptional experience..." required onChange={e => setNewHotel({ ...newHotel, description: e.target.value })} />
@@ -214,7 +212,6 @@ const AdminDashboard = () => {
                                     </select>
                                 </div>
                             </div>
-
                             <div className="input-group">
                                 <label>Suite Image</label>
                                 <div className="file-upload-wrapper glass">
@@ -225,7 +222,6 @@ const AdminDashboard = () => {
                                     </label>
                                 </div>
                             </div>
-
                             <div className="input-group">
                                 <label>Nightly Rate ($)</label>
                                 <input type="number" placeholder="Price" required onChange={e => setNewRoom({ ...newRoom, price: e.target.value })} />
@@ -244,7 +240,7 @@ const AdminDashboard = () => {
 
             {activeTab === 'hotels' ? (
                 <div className="inventory-grid">
-                    {hotels.map(h => (
+                    {loading ? <div className="loader"><Loader2 className="spin" size={40} /></div> : hotels.map(h => (
                         <div key={h._id} className="inventory-item">
                             <div className="inventory-card glass-premium">
                                 <div className="item-main" onClick={() => setExpandedHotel(expandedHotel === h._id ? null : h._id)}>
@@ -263,7 +259,7 @@ const AdminDashboard = () => {
                                     </div>
                                     <div className="btn-group">
                                         <button className="btn-icon-gold" onClick={(e) => { e.stopPropagation(); setShowRoomForm(h._id); }} title="Add Room"><Plus size={18} /></button>
-                                        <button className="btn-icon-danger" onClick={(e) => { e.stopPropagation(); handleDeleteHotel(h._id); }} title="Delete Hotel">
+                                        <button className="btn-icon-danger" onClick={(e) => { e.stopPropagation(); handleDeleteHotel(h._id); }}>
                                             <Trash2 size={18} />
                                             <span style={{ fontSize: '0.7rem', fontWeight: 800, marginLeft: '8px' }}>REMOVE PROPERTY</span>
                                         </button>
@@ -291,49 +287,41 @@ const AdminDashboard = () => {
                 </div>
             ) : (
                 <div className="bookings-stream">
-                    {bookings.length > 0 ? bookings.map((b, i) => (
-                        <motion.div
-                            key={b._id}
-                            className="stream-card glass-premium"
-                            initial={{ opacity: 0, x: -20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: i * 0.05 }}
-                        >
-                            <div className="stream-user">
-                                <div className="user-avatar glass"><UserIcon size={20} /></div>
-                                <div><h4>{b.user?.name}</h4><p>{b.user?.email}</p></div>
-                            </div>
-                            <div className="stream-property">
-                                <Hotel size={20} className="text-gold" />
-                                <div><h4>{b.hotel?.name || 'Luxury Stay'}</h4><p>Unit {b.room?.roomNumber} ({b.room?.type})</p></div>
-                            </div>
-                            <div className="stream-dates">
-                                <Calendar size={20} className="text-muted" />
-                                <div><h4>{new Date(b.checkInDate).toLocaleDateString()}</h4><p>Duration Secured</p></div>
-                            </div>
-                            <div className="stream-status">
-                                <span className={`status-pill ${b.status.toLowerCase()}`}>{b.status}</span>
-                                <div className="stream-actions">
-                                    {b.status === 'Pending' && (
-                                        <button className="btn-accept" onClick={() => handleConfirmBooking(b._id)} title="Accept Booking">
-                                            <CheckCircle size={16} /> Accept
-                                        </button>
-                                    )}
-                                    {b.user?.phone && (
-                                        <a href={`https://wa.me/${b.user.phone.replace(/[^0-9]/g, '')}`} target="_blank" rel="noopener noreferrer" className="btn-contact" title={`Call ${b.user.phone}`}>
-                                            <Phone size={16} /> Contact
-                                        </a>
-                                    )}
+                    {loading ? <div className="loader"><Loader2 className="spin" size={40} /></div> :
+                        bookings.length > 0 ? bookings.map((b, i) => (
+                            <motion.div key={b._id} className="stream-card glass-premium" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.05 }}>
+                                <div className="stream-user">
+                                    <div className="user-avatar glass"><UserIcon size={20} /></div>
+                                    <div><h4>{b.user?.name}</h4><p>{b.user?.email}</p></div>
                                 </div>
-                            </div>
-                        </motion.div>
-                    )) : <div className="empty-stream glass"><h3>No active bookings detected</h3><p>Your property stream is currently empty.</p></div>}
+                                <div className="stream-property">
+                                    <Hotel size={20} className="text-gold" />
+                                    <div><h4>{b.hotel?.name || 'Luxury Stay'}</h4><p>Unit {b.room?.roomNumber} ({b.room?.type})</p></div>
+                                </div>
+                                <div className="stream-dates">
+                                    <Calendar size={20} className="text-muted" />
+                                    <div><h4>{new Date(b.checkInDate).toLocaleDateString()}</h4><p>Duration Secured</p></div>
+                                </div>
+                                <div className="stream-status">
+                                    <span className={`status-pill ${b.status.toLowerCase()}`}>{b.status}</span>
+                                    <div className="stream-actions">
+                                        {b.status === 'Pending' && (
+                                            <button className="btn-accept" onClick={() => handleConfirmBooking(b._id)}>
+                                                <CheckCircle size={16} /> Accept
+                                            </button>
+                                        )}
+                                        {b.user?.phone && (
+                                            <a href={`https://wa.me/${b.user.phone.replace(/[^0-9]/g, '')}`} target="_blank" rel="noopener noreferrer" className="btn-contact">
+                                                <Phone size={16} /> Contact
+                                            </a>
+                                        )}
+                                    </div>
+                                </div>
+                            </motion.div>
+                        )) : <div className="empty-stream glass"><h3>No active bookings detected</h3><p>Your property stream is currently empty.</p></div>
+                    }
                 </div>
             )}
-
-
         </div>
     );
-};
-
-export default AdminDashboard;
+}

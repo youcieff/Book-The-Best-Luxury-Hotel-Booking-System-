@@ -58,7 +58,7 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
 
                         <h2>{mode === 'login' ? 'Welcome Back' : 'Join Us'}</h2>
                         <p className="subtitle">
-                            {mode === 'login' ? 'Sign in to access your premium bookings' : 'Create an account to start booking the world\'s finest hotels'}
+                            {mode === 'login' ? 'Sign in to access your premium bookings' : "Create an account to start booking the world's finest hotels"}
                         </p>
 
                         <form onSubmit={handleSubmit}>
@@ -116,8 +116,6 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
                             )}
                         </div>
                     </motion.div>
-
-
                 </div>
             )}
         </AnimatePresence>

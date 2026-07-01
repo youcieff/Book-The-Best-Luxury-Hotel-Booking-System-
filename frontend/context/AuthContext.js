@@ -1,11 +1,8 @@
-import { createContext, useState, useEffect, useContext } from 'react';
+import { createContext, useState, useContext } from 'react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 
 const AuthContext = createContext();
-
-// Detect if running on Vercel (no backend available)
-const IS_DEMO = !window.location.hostname.includes('localhost');
 
 const DEMO_USER = {
     _id: 'demo_user_001',
@@ -17,8 +14,11 @@ const DEMO_USER = {
 };
 
 export const AuthProvider = ({ children }) => {
+    const isDemo = typeof window !== 'undefined' && !window.location.hostname.includes('localhost');
+
     const [user, setUser] = useState(() => {
-        if (IS_DEMO) return DEMO_USER;
+        if (typeof window === 'undefined') return null;
+        if (isDemo) return DEMO_USER;
         return JSON.parse(localStorage.getItem('user')) || null;
     });
     const [loading, setLoading] = useState(false);
@@ -26,7 +26,7 @@ export const AuthProvider = ({ children }) => {
     const API_URL = 'http://localhost:5000/api/auth';
 
     const login = async (email, password) => {
-        if (IS_DEMO) {
+        if (isDemo) {
             setUser(DEMO_USER);
             toast.success(`Welcome back, ${DEMO_USER.name}!`);
             return true;
@@ -47,7 +47,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     const register = async (userData) => {
-        if (IS_DEMO) {
+        if (isDemo) {
             setUser(DEMO_USER);
             toast.success('Account created successfully!');
             return true;
@@ -68,7 +68,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     const logout = () => {
-        if (IS_DEMO) {
+        if (isDemo) {
             setUser(null);
             toast.success('Logged out successfully');
             setTimeout(() => setUser(DEMO_USER), 1500);
@@ -80,7 +80,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ user, login, register, logout, loading, IS_DEMO }}>
+        <AuthContext.Provider value={{ user, login, register, logout, loading, isDemo }}>
             {children}
         </AuthContext.Provider>
     );

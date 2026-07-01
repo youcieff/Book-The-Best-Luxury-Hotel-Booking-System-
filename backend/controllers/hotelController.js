@@ -1,9 +1,6 @@
 const Hotel = require('../models/Hotel');
 const Room = require('../models/Room');
 
-// @desc    Get all hotels
-// @route   GET /api/hotels
-// @access  Public
 exports.getHotels = async (req, res) => {
   try {
     const hotels = await Hotel.find();
@@ -13,9 +10,6 @@ exports.getHotels = async (req, res) => {
   }
 };
 
-// @desc    Get single hotel
-// @route   GET /api/hotels/:id
-// @access  Public
 exports.getHotel = async (req, res) => {
   try {
     const hotel = await Hotel.findById(req.params.id);
@@ -26,9 +20,6 @@ exports.getHotel = async (req, res) => {
   }
 };
 
-// @desc    Create hotel
-// @route   POST /api/hotels
-// @access  Admin
 exports.createHotel = async (req, res) => {
   try {
     const hotel = await Hotel.create(req.body);
@@ -38,9 +29,6 @@ exports.createHotel = async (req, res) => {
   }
 };
 
-// @desc    Update hotel
-// @route   PUT /api/hotels/:id
-// @access  Admin
 exports.updateHotel = async (req, res) => {
   try {
     const hotel = await Hotel.findByIdAndUpdate(req.params.id, req.body, { new: true });
@@ -50,9 +38,6 @@ exports.updateHotel = async (req, res) => {
   }
 };
 
-// @desc    Delete hotel
-// @route   DELETE /api/hotels/:id
-// @access  Admin
 exports.deleteHotel = async (req, res) => {
   try {
     await Hotel.findByIdAndDelete(req.params.id);
@@ -62,9 +47,6 @@ exports.deleteHotel = async (req, res) => {
   }
 };
 
-// @desc    Get rooms of a specific hotel
-// @route   GET /api/hotels/:id/rooms
-// @access  Public
 exports.getHotelRooms = async (req, res) => {
     try {
         const rooms = await Room.find({ hotel: req.params.id });

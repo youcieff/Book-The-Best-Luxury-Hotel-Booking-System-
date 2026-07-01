@@ -6,7 +6,7 @@ import toast from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
 
 const BookingModal = ({ isOpen, onClose, room }) => {
-    const { user } = useAuth();
+    const { user, isDemo } = useAuth();
     const [dates, setDates] = useState({ checkIn: '', checkOut: '' });
     const [totalPrice, setTotalPrice] = useState(0);
 
@@ -25,8 +25,14 @@ const BookingModal = ({ isOpen, onClose, room }) => {
         e.preventDefault();
         if (totalPrice <= 0) return toast.error('Invalid dates');
 
+        if (isDemo) {
+            toast.success('Booking confirmed! (Demo Mode)');
+            onClose();
+            return;
+        }
+
         try {
-            const { data } = await axios.post(
+            await axios.post(
                 'http://localhost:5000/api/bookings',
                 {
                     room: room._id,
@@ -101,8 +107,6 @@ const BookingModal = ({ isOpen, onClose, room }) => {
                             </button>
                         </form>
                     </motion.div>
-
-
                 </div>
             )}
         </AnimatePresence>

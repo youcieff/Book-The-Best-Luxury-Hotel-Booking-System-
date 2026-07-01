@@ -1,19 +1,17 @@
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useRouter } from 'next/router';
 import axios from 'axios';
 import { motion } from 'framer-motion';
 import { Loader2, MapPin } from 'lucide-react';
-import RoomCard from '../components/RoomCard';
-import BookingModal from '../components/BookingModal';
-import { useAuth } from '../context/AuthContext';
+import RoomCard from '../../components/RoomCard';
+import BookingModal from '../../components/BookingModal';
+import BackButton from '../../components/BackButton';
+import Navbar from '../../components/Navbar';
+import AuthModal from '../../components/AuthModal';
 
-const IS_DEMO = !window.location.hostname.includes('localhost');
-
-// Demo data mapped to each demo hotel id
 const DEMO_HOTEL_DATA = {
     h1: {
-        name: 'The Royal Palace Hotel',
-        location: 'Cairo, Egypt',
+        name: 'The Royal Palace Hotel', location: 'Cairo, Egypt',
         image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&q=80&w=2000',
         description: 'Experience timeless luxury in the heart of Cairo. An iconic palace hotel with world-class amenities and impeccable service.',
         rooms: [
@@ -23,8 +21,7 @@ const DEMO_HOTEL_DATA = {
         ]
     },
     h2: {
-        name: 'Azure Beach Resort',
-        location: 'Hurghada, Egypt',
+        name: 'Azure Beach Resort', location: 'Hurghada, Egypt',
         image: 'https://images.unsplash.com/photo-1582719508461-905c673771fd?auto=format&fit=crop&q=80&w=2000',
         description: 'Modern luxury meets pristine beaches. Our exclusive summer sanctuary offers a perfect retreat from the daily hustle.',
         rooms: [
@@ -33,8 +30,7 @@ const DEMO_HOTEL_DATA = {
         ]
     },
     h3: {
-        name: 'Nile View Grand Hotel',
-        location: 'Luxor, Egypt',
+        name: 'Nile View Grand Hotel', location: 'Luxor, Egypt',
         image: 'https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&q=80&w=2000',
         description: 'Set along the historic Nile, wake up to views of ancient temples and golden sunsets every morning.',
         rooms: [
@@ -43,27 +39,24 @@ const DEMO_HOTEL_DATA = {
         ]
     },
     h4: {
-        name: 'Pyramids Luxury Suites',
-        location: 'Giza, Egypt',
+        name: 'Pyramids Luxury Suites', location: 'Giza, Egypt',
         image: 'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&q=80&w=2000',
         description: 'The only hotel where you wake up to a direct view of the Great Pyramids. History and luxury in perfect harmony.',
         rooms: [
             { _id: 'r8', roomNumber: 'P-101', type: 'Single', price: 280, description: 'Standard suite with pyramid-facing window and guided tour packages included.', isAvailable: true, image: 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?auto=format&fit=crop&q=80&w=800' },
-            { _id: 'r9', roomNumber: 'P-301', type: 'Suite', price: 900, description: 'The Pharaoh Suite - an unobstructed 270° view of all three Pyramids of Giza.', isAvailable: false, image: 'https://images.unsplash.com/photo-1591088398332-8a7791972843?auto=format&fit=crop&q=80&w=800' },
+            { _id: 'r9', roomNumber: 'P-301', type: 'Suite', price: 900, description: 'The Pharaoh Suite — unobstructed 270° view of all three Pyramids of Giza.', isAvailable: false, image: 'https://images.unsplash.com/photo-1591088398332-8a7791972843?auto=format&fit=crop&q=80&w=800' },
         ]
     },
     h5: {
-        name: 'Marina Bay Resort',
-        location: 'Alexandria, Egypt',
+        name: 'Marina Bay Resort', location: 'Alexandria, Egypt',
         image: 'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&q=80&w=2000',
-        description: 'Overlooking the magnificent Mediterranean, Alexandria\'s finest resort blending ancient culture with modern elegance.',
+        description: "Overlooking the magnificent Mediterranean, Alexandria's finest resort blending ancient culture with modern elegance.",
         rooms: [
             { _id: 'r10', roomNumber: 'M-201', type: 'Double', price: 190, description: 'Mediterranean-view double room with a private balcony and daily spa credit.', isAvailable: true, image: 'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&q=80&w=800' },
         ]
     },
     h6: {
-        name: 'Desert Oasis Hotel',
-        location: 'Sharm El Sheikh, Egypt',
+        name: 'Desert Oasis Hotel', location: 'Sharm El Sheikh, Egypt',
         image: 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&q=80&w=2000',
         description: 'A hidden gem nestled between the Red Sea and Sinai mountains. Dive, relax, and reconnect with nature in total luxury.',
         rooms: [
@@ -73,47 +66,34 @@ const DEMO_HOTEL_DATA = {
     },
 };
 
-const FALLBACK_HOTEL = {
-    name: 'Luxury Hotel',
-    location: 'Egypt',
-    image: 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&q=80&w=2000',
-    description: 'A world-class luxury property offering exceptional hospitality and unforgettable experiences.',
-    rooms: []
-};
+const FALLBACK = { name: 'Luxury Hotel', location: 'Egypt', image: 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&q=80&w=2000', description: 'A world-class luxury property offering exceptional hospitality.', rooms: [] };
 
-const HotelRooms = () => {
-    const { id } = useParams();
+export default function HotelRooms() {
+    const router = useRouter();
+    const { id } = router.query;
     const [hotel, setHotel] = useState(null);
     const [rooms, setRooms] = useState([]);
     const [loading, setLoading] = useState(true);
     const [selectedRoom, setSelectedRoom] = useState(null);
+    const [authOpen, setAuthOpen] = useState(false);
+
+    const isDemo = typeof window !== 'undefined' && !window.location.hostname.includes('localhost');
 
     useEffect(() => {
-        if (IS_DEMO) {
-            const demoHotel = DEMO_HOTEL_DATA[id] || FALLBACK_HOTEL;
-            setTimeout(() => {
-                setHotel(demoHotel);
-                setRooms(demoHotel.rooms);
-                setLoading(false);
-            }, 600);
+        if (!id) return;
+        if (isDemo) {
+            const demoHotel = DEMO_HOTEL_DATA[id] || FALLBACK;
+            setTimeout(() => { setHotel(demoHotel); setRooms(demoHotel.rooms); setLoading(false); }, 600);
             return;
         }
-
-        const fetchData = async () => {
-            try {
-                const [hotelRes, roomsRes] = await Promise.all([
-                    axios.get(`http://localhost:5000/api/hotels/${id}`),
-                    axios.get(`http://localhost:5000/api/hotels/${id}/rooms`)
-                ]);
-                setHotel(hotelRes.data);
-                setRooms(roomsRes.data);
-            } catch (error) {
-                console.error('Error fetching data:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchData();
+        Promise.all([
+            axios.get(`http://localhost:5000/api/hotels/${id}`),
+            axios.get(`http://localhost:5000/api/hotels/${id}/rooms`)
+        ]).then(([hotelRes, roomsRes]) => {
+            setHotel(hotelRes.data);
+            setRooms(roomsRes.data);
+        }).catch(console.error)
+        .finally(() => setLoading(false));
     }, [id]);
 
     if (loading) return <div className="loader container"><Loader2 className="spin" size={40} /></div>;
@@ -121,13 +101,14 @@ const HotelRooms = () => {
 
     return (
         <div className="hotel-rooms-page container user-bg">
+            <Navbar onAuthClick={() => setAuthOpen(true)} />
+            <AuthModal isOpen={authOpen} onClose={() => setAuthOpen(false)} />
+            <BackButton />
+
             <section className="hotel-header">
                 <motion.div
                     className="hotel-hero-img"
-                    style={{
-                        backgroundImage: `url(${hotel.image.startsWith('http') ? hotel.image : 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&q=80&w=2000'})`,
-                        backgroundColor: '#0b0d17'
-                    }}
+                    style={{ backgroundImage: `url(${hotel.image})`, backgroundColor: '#0b0d17' }}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                 >
@@ -147,9 +128,8 @@ const HotelRooms = () => {
             <section className="rooms-grid-container">
                 <div className="section-title">
                     <h2>Available Suites & Rooms</h2>
-                    <p>Select your preferred luxury accomodation</p>
+                    <p>Select your preferred luxury accommodation</p>
                 </div>
-
                 <div className="rooms-grid">
                     {rooms.map(room => (
                         <RoomCard key={room._id} room={room} onBook={(r) => setSelectedRoom(r)} />
@@ -159,14 +139,8 @@ const HotelRooms = () => {
             </section>
 
             {selectedRoom && (
-                <BookingModal
-                    isOpen={!!selectedRoom}
-                    onClose={() => setSelectedRoom(null)}
-                    room={selectedRoom}
-                />
+                <BookingModal isOpen={!!selectedRoom} onClose={() => setSelectedRoom(null)} room={selectedRoom} />
             )}
         </div>
     );
-};
-
-export default HotelRooms;
+}

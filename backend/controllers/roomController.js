@@ -1,9 +1,6 @@
 const asyncHandler = require('express-async-handler');
 const Room = require('../models/Room');
 
-// @desc    Get all rooms (with pagination)
-// @route   GET /api/rooms?page=1&limit=10
-// @access  Public
 const getRooms = asyncHandler(async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
@@ -24,9 +21,6 @@ const getRooms = asyncHandler(async (req, res) => {
     });
 });
 
-// @desc    Get room by ID
-// @route   GET /api/rooms/:id
-// @access  Public
 const getRoomById = asyncHandler(async (req, res) => {
     const room = await Room.findById(req.params.id);
 
@@ -38,9 +32,6 @@ const getRoomById = asyncHandler(async (req, res) => {
     }
 });
 
-// @desc    Create a room
-// @route   POST /api/rooms
-// @access  Private/Admin
 const createRoom = asyncHandler(async (req, res) => {
     const { roomNumber, type, price, description, hotel } = req.body;
 
@@ -64,9 +55,6 @@ const createRoom = asyncHandler(async (req, res) => {
     res.status(201).json(createdRoom);
 });
 
-// @desc    Update a room
-// @route   PUT /api/rooms/:id
-// @access  Private/Admin
 const updateRoom = asyncHandler(async (req, res) => {
     const { roomNumber, type, price, isAvailable, description, hotel } = req.body;
 
@@ -79,7 +67,7 @@ const updateRoom = asyncHandler(async (req, res) => {
         room.isAvailable = isAvailable !== undefined ? isAvailable : room.isAvailable;
         room.description = description || room.description;
         room.hotel = hotel || room.hotel;
-        
+
         if (req.file) {
             room.image = `/uploads/${req.file.filename}`;
         }
@@ -92,9 +80,6 @@ const updateRoom = asyncHandler(async (req, res) => {
     }
 });
 
-// @desc    Delete a room
-// @route   DELETE /api/rooms/:id
-// @access  Private/Admin
 const deleteRoom = asyncHandler(async (req, res) => {
     const room = await Room.findById(req.params.id);
 
